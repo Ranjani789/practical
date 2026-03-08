@@ -1,0 +1,244 @@
+import React, { useState } from "react";
+
+const fruits = [
+  { name: "Apple", price: 100, image: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce" },
+  { name: "Banana", price: 60, image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e" },
+  { name: "Orange", price: 50, image: "https://images.unsplash.com/photo-1580052614034-c55d20bfee3b" },
+  { name: "Grapes", price: 80, image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f" },
+  { name: "Strawberry", price: 150, image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6" }
+];
+
+const vegetables = [
+  {
+    name: "Tomato",
+    price: 30,
+    image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337"
+  },
+  {
+    name: "Carrot",
+    price: 60,
+    image: "https://images.unsplash.com/photo-1447175008436-054170c2e979"
+  },
+  {
+    name: "Broccoli",
+    price: 50,
+    image: "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc"
+  },
+  {
+    name: "Cucumber",
+    price: 20,
+    image: "https://images.unsplash.com/photo-1604977042946-1eecc30f269e"
+  },
+  {
+    name: "Bell Pepper",
+    price: 40,
+    image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83"
+  }
+];
+
+export default function App() {
+
+  const [cart, setCart] = useState([]);
+  const [page, setPage] = useState("home");
+  const [message, setMessage] = useState("");
+
+  const addToCart = (item) => {
+    setCart([...cart, item]);
+    setMessage(item.name + " added to cart");
+    setTimeout(() => setMessage(""), 2000);
+  };
+
+  const checkout = () => {
+    setCart([]);
+    setMessage("✅ Order placed successfully!");
+  };
+
+  const ProductCard = ({ product }) => (
+    <div style={styles.card}>
+      <img src={product.image} alt={product.name} style={styles.image}/>
+      <h3 style={{color:"#4cc9f0"}}>{product.name}</h3>
+      <p>${product.price}</p>
+      <button style={styles.button} onClick={()=>addToCart(product)}>
+        Add to Cart
+      </button>
+    </div>
+  );
+
+  if(page==="cart"){
+    return(
+      <div style={styles.container}>
+        <h1>🛒 Cart Page</h1>
+
+        {cart.length===0 && <p>Your cart is empty</p>}
+
+        {cart.map((item,i)=>(
+          <p key={i}>{item.name} - Rs.{item.price}</p>
+        ))}
+
+        {cart.length>0 &&
+          <button style={styles.button} onClick={checkout}>
+            Checkout
+          </button>
+        }
+
+        <br/><br/>
+
+        <button style={styles.button} onClick={()=>setPage("home")}>
+          Back to Shop
+        </button>
+
+        {message && <p style={styles.success}>{message}</p>}
+      </div>
+    )
+  }
+const [cartOpen,setCartOpen] = useState(false);
+  return (
+    <div style={styles.container}>
+
+      <div style={styles.header}>
+        <h1 style={styles.title}>SmartCart 🛒</h1>
+
+        <button style={styles.cartBtn} onClick={()=>setCartOpen(true)}>
+          Cart ({cart.length})
+        </button>
+      </div>
+
+      {message && <p style={styles.success}>{message}</p>}
+
+      <h2 style={styles.category}>Fruits</h2>
+
+      <div style={styles.grid}>
+        {fruits.map((p,i)=>(
+          <ProductCard key={i} product={p}/>
+        ))}
+      </div>
+
+      <h2 style={styles.category}>Vegetables</h2>
+
+      <div style={styles.grid}>
+        {vegetables.map((p,i)=>(
+          <ProductCard key={i} product={p}/>
+        ))}
+      </div>
+<div style={{
+ position:"fixed",
+ top:0,
+ right:0,
+ width:"320px",
+ height:"100vh",
+ background:"#0b253f",
+ padding:"20px",
+ transition:"transform 0.3s ease",
+ transform: cartOpen ? "translateX(0)" : "translateX(100%)",
+ boxShadow:"-4px 0 10px rgba(0,0,0,0.5)"
+}}>
+
+<h2>🛒 Cart</h2>
+
+<button
+onClick={()=>setCartOpen(false)}
+style={{
+background:"red",
+color:"white",
+border:"none",
+padding:"5px 10px",
+cursor:"pointer"
+}}
+>
+Close
+</button>
+
+{cart.length===0 && <p>No items added</p>}
+
+{cart.map((item,i)=>(
+<p key={i}>{item.name} - Rs.{item.price}</p>
+))}
+
+{cart.length>0 &&
+<button style={styles.button} onClick={checkout}>
+Checkout
+</button>
+}
+
+</div>
+    </div>
+  );
+}
+
+const styles = {
+
+   container:{
+  minHeight:"100vh",
+  width:"100vw",
+  background:"#071a2d",
+  color:"white",
+  padding:"20px",
+  boxSizing:"border-box",
+  overflowX:"hidden"
+    },
+
+  header:{
+    display:"flex",
+    justifyContent:"space-between",
+    alignItems:"center",
+    marginBottom:"30px"
+  },
+
+  title:{
+    color:"#4cc9f0",
+    fontSize:"40px"
+  },
+
+ cartBtn:{
+  background:"#4cc9f0",
+  border:"none",
+  padding:"10px 20px",
+  borderRadius:"8px",
+  fontWeight:"bold",
+  cursor:"pointer",
+  position:"relative",
+  zIndex:10
+},
+
+  category:{
+    textAlign:"center",
+    marginTop:"20px"
+  },
+
+  grid:{
+    display:"grid",
+    gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
+    gap:"25px",
+    maxWidth:"1400px",
+    margin:"20px auto"
+  },
+
+  card:{
+    background:"#1c2b3c",
+    padding:"20px",
+    borderRadius:"12px",
+    textAlign:"center"
+  },
+
+  image:{
+    width:"100%",
+    height:"140px",
+    objectFit:"cover",
+    borderRadius:"8px"
+  },
+
+  button:{
+    background:"#4cc9f0",
+    border:"none",
+    padding:"10px 16px",
+    borderRadius:"6px",
+    cursor:"pointer",
+    marginTop:"10px",
+    fontWeight:"bold"
+  },
+
+  success:{
+    textAlign:"center",
+    color:"lightgreen"
+  }
+};
