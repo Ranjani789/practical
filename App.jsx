@@ -1,0 +1,293 @@
+import React from "react";
+import { createStore } from "redux";
+import { Provider, useSelector, useDispatch } from "react-redux";
+
+/* ---------------- PRODUCTS ---------------- */
+
+const products = [
+  // Electronics
+  { id: 1, name: "iPhone 14", price: 79999, category: "Electronics", image: "https://m.media-amazon.com/images/I/61bK6PMOC3L._SX679_.jpg" },
+  { id: 2, name: "Gaming Laptop", price: 95000, category: "Electronics", image: "https://m.media-amazon.com/images/I/71TPda7cwUL._SX679_.jpg" },
+  { id: 3, name: "Samsung Tablet", price: 35000, category: "Electronics", image: "https://m.media-amazon.com/images/I/61L1ItFgFHL._SX679_.jpg" },
+  { id: 4, name: "Bluetooth Speaker", price: 3999, category: "Electronics", image: "https://m.media-amazon.com/images/I/81QpkIctqPL._SX679_.jpg" },
+
+  // Fashion
+  { id: 5, name: "Running Shoes", price: 2999, category: "Fashion", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" },
+  { id: 6, name: "Backpack", price: 1999, category: "Fashion", image: "https://m.media-amazon.com/images/I/81fPKd-2AYL._SY741_.jpg" },
+  { id: 7, name: "Men Jacket", price: 3499, category: "Fashion", image: "https://images.unsplash.com/photo-1520975954732-35dd22299614?w=500" },
+  { id: 8, name: "Casual Shirt", price: 1499, category: "Fashion", image: "https://m.media-amazon.com/images/I/71HblAHs5xL._SY879_.jpg" },
+
+  // Gadgets
+  { id: 9, name: "Smart Watch", price: 6999, category: "Gadgets", image: "https://m.media-amazon.com/images/I/61ZjlBOp+rL._SX679_.jpg" },
+  { id: 10, name: "VR Headset", price: 12999, category: "Gadgets", image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=500" },
+  { id: 11, name: "Drone Camera", price: 18999, category: "Gadgets", image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=500" },
+  { id: 12, name: "Action Camera", price: 8999, category: "Gadgets", image: "https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?w=500" }
+];
+
+/* ---------------- REDUX ---------------- */
+
+const initialState = { cart: [] };
+
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    case "ADD":
+      return { ...state, cart: [...state.cart, action.payload] };
+
+    case "REMOVE":
+      return {
+        ...state,
+        cart: state.cart.filter((_, i) => i !== action.payload)
+      };
+
+    case "CLEAR_CART":
+      return { ...state, cart: [] };
+
+    default:
+      return state;
+  }
+}
+
+const store = createStore(reducer);
+
+/* ---------------- NAVBAR ---------------- */
+
+function Navbar() {
+  const cart = useSelector((state) => state.cart);
+
+  return (
+    <div style={styles.navbar}>
+      <h2>🛒 ShopEase</h2>
+      <div style={styles.cart}>Cart ({cart.length})</div>
+    </div>
+  );
+}
+
+/* ---------------- PRODUCT LIST ---------------- */
+
+function Products() {
+  const dispatch = useDispatch();
+  const categories = [...new Set(products.map((p) => p.category))];
+
+  return (
+    <div style={styles.products}>
+      {categories.map((cat) => (
+        <div key={cat}>
+          <h2 style={styles.category}>{cat}</h2>
+
+          <div style={styles.grid}>
+            {products
+              .filter((p) => p.category === cat)
+              .map((p) => (
+                <div key={p.id} style={styles.card}>
+                  <img src={p.image} alt={p.name} style={styles.image} />
+
+                  <h3>{p.name}</h3>
+                  <p style={styles.price}>₹{p.price}</p>
+
+                  <button
+                    style={styles.button}
+                    onClick={() => dispatch({ type: "ADD", payload: p })}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- CART ---------------- */
+
+function Cart() {
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const checkout = () => {
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    alert("Order placed successfully!");
+    dispatch({ type: "CLEAR_CART" });
+  };
+
+  return (
+    <div style={styles.cartBox}>
+      <h2>Shopping Cart</h2>
+
+      {cart.length === 0 && <p>No items added</p>}
+
+      {cart.map((item, index) => (
+        <div key={index} style={styles.cartItem}>
+          <img src={item.image} alt="" style={styles.cartImage} />
+
+          <div>
+            <h4>{item.name}</h4>
+            <p>₹{item.price}</p>
+          </div>
+
+          <button
+            style={styles.remove}
+            onClick={() => dispatch({ type: "REMOVE", payload: index })}
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+
+      {cart.length > 0 && (
+        <>
+          <h3>Total: ₹{total}</h3>
+
+          <button style={styles.checkout} onClick={checkout}>
+            Proceed to Checkout
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- APP ---------------- */
+
+function App() {
+  return (
+    <Provider store={store}>
+      <div style={styles.container}>
+        <Navbar />
+
+        <div style={styles.layout}>
+          <Products />
+          <Cart />
+        </div>
+      </div>
+    </Provider>
+  );
+}
+
+/* ---------------- STYLES ---------------- */
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    width: "100vw",
+    background: "#f5f6fa",
+    fontFamily: "Segoe UI"
+  },
+
+  navbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "20px 40px",
+    background: "#6c63ff",
+    color: "white",
+    fontSize: "18px"
+  },
+
+  cart: {
+    fontWeight: "bold"
+  },
+
+  layout: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "40px",
+    padding: "40px",
+    flexWrap: "wrap"
+  },
+
+  products: {
+    maxWidth: "900px",
+    width: "100%"
+  },
+
+  category: {
+    marginBottom: "15px"
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))",
+    gap: "20px"
+  },
+
+  card: {
+    background: "white",
+    borderRadius: "10px",
+    padding: "15px",
+    textAlign: "center",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+  },
+
+  image: {
+    width: "100%",
+    height: "180px",
+    objectFit: "contain",
+    marginBottom: "10px"
+  },
+
+  price: {
+    fontWeight: "bold",
+    fontSize: "16px"
+  },
+
+  button: {
+    marginTop: "10px",
+    background: "#6c63ff",
+    color: "white",
+    border: "none",
+    padding: "8px 15px",
+    borderRadius: "6px",
+    cursor: "pointer"
+  },
+
+  cartBox: {
+    width: "320px",
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+  },
+
+  cartItem: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    marginBottom: "12px"
+  },
+
+  cartImage: {
+    width: "45px",
+    height: "45px",
+    objectFit: "contain"
+  },
+
+  remove: {
+    background: "red",
+    color: "white",
+    border: "none",
+    padding: "6px 10px",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+
+  checkout: {
+    marginTop: "15px",
+    background: "green",
+    color: "white",
+    border: "none",
+    padding: "10px",
+    width: "100%",
+    borderRadius: "6px",
+    cursor: "pointer"
+  }
+};
+
+export default App;
