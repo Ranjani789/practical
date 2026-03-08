@@ -1,0 +1,264 @@
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+function App() {
+  return (
+    <Router>
+      <div style={styles.app}>
+        <Navbar />
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/doctors" element={<Doctors />} />
+          <Route path="/appointment" element={<Appointment />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+/* ---------------- Navbar ---------------- */
+
+function Navbar() {
+  return (
+    <nav style={styles.nav}>
+      <h2 style={{ margin: 0 }}>🏥 MediCare</h2>
+
+      <div>
+        <Link style={styles.link} to="/">Home</Link>
+        <Link style={styles.link} to="/doctors">Doctors</Link>
+        <Link style={styles.link} to="/appointment">Appointment</Link>
+        <Link style={styles.link} to="/contact">Contact</Link>
+      </div>
+    </nav>
+  );
+}
+
+/* ---------------- Home ---------------- */
+
+function Home() {
+  return (
+    <div style={styles.page}>
+      <h1>Welcome to MediCare Hospital</h1>
+      <p>Your health is our priority.</p>
+
+      <div style={styles.cardContainer}>
+        <div style={styles.card}>
+          <h3>👨‍⚕️ Expert Doctors</h3>
+          <p>Consult experienced specialists.</p>
+        </div>
+
+        <div style={styles.card}>
+          <h3>📅 Easy Booking</h3>
+          <p>Book appointments in seconds.</p>
+        </div>
+
+        <div style={styles.card}>
+          <h3>💊 Quality Care</h3>
+          <p>World class healthcare services.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Doctors ---------------- */
+
+function Doctors() {
+  const doctors = [
+    { name: "Dr. Ranjani", spec: "Cardiologist" },
+    { name: "Dr. Ramsree", spec: "Dermatologist" },
+    { name: "Dr. Priya", spec: "Neurologist" }
+  ];
+
+  return (
+    <div style={styles.page}>
+      <h1>Our Doctors</h1>
+
+      <div style={styles.cardContainer}>
+        {doctors.map((doc, index) => (
+          <div key={index} style={styles.card}>
+            <h3>{doc.name}</h3>
+            <p>{doc.spec}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Appointment ---------------- */
+
+function Appointment() {
+  const [name, setName] = useState("");
+  const [doctor, setDoctor] = useState("");
+  const [date, setDate] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!name || !doctor || !date) {
+      setMessage("Please fill all fields");
+      return;
+    }
+
+    setMessage("✅ Appointment booked successfully!");
+    setName("");
+    setDoctor("");
+    setDate("");
+  };
+
+  return (
+    <div style={styles.page}>
+      <h1>Book Appointment</h1>
+
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <input
+          style={styles.input}
+          placeholder="Your Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <select
+          style={styles.input}
+          value={doctor}
+          onChange={(e) => setDoctor(e.target.value)}
+        >
+          <option value="">Select Doctor</option>
+          <option>Dr. Ranjani</option>
+          <option>Dr. Ramsree</option>
+          <option>Dr. Priya</option>
+        </select>
+
+        <input
+          type="date"
+          style={styles.input}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+
+        <button style={styles.button}>Book Appointment</button>
+      </form>
+
+      {message && <p style={styles.success}>{message}</p>}
+    </div>
+  );
+}
+
+/* ---------------- Contact ---------------- */
+
+function Contact() {
+  return (
+    <div style={styles.page}>
+      <h1>Contact Us</h1>
+
+      <div style={styles.card}>
+        <p>📧 Email: medicare@gmail.com</p>
+        <p>📞 Phone: +91 9876543210</p>
+        <p>📍 Location: Chennai, India</p>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Styles ---------------- */
+
+const styles = {
+  app: {
+    minHeight: "100vh",
+    width: "100vw",
+    fontFamily: "Segoe UI, sans-serif",
+    background: "linear-gradient(to right,#74ebd5,#acb6e5)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+
+  nav: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "15px 40px",
+    background: "#6c63ff",
+    color: "white",
+    boxSizing: "border-box"
+  },
+
+  link: {
+    marginLeft: "20px",
+    textDecoration: "none",
+    color: "white",
+    fontWeight: "600",
+    fontSize: "16px"
+  },
+
+  page: {
+    flex: 1,
+    width: "100%",
+    maxWidth: "1100px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "40px 20px",
+    boxSizing: "border-box"
+  },
+
+  cardContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "25px",
+    marginTop: "30px",
+    width: "100%"
+  },
+
+  card: {
+    background: "white",
+    padding: "25px",
+    borderRadius: "12px",
+    width: "230px",
+    textAlign: "center",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.1)"
+  },
+
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "15px",
+    marginTop: "20px"
+  },
+
+  input: {
+    padding: "10px",
+    width: "260px",
+    borderRadius: "6px",
+    border: "1px solid #ccc"
+  },
+
+  button: {
+    padding: "10px 20px",
+    background: "#6c63ff",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600"
+  },
+
+  success: {
+    marginTop: "20px",
+    color: "green",
+    fontWeight: "bold"
+  }
+};
+
+
+export default App;
